@@ -1,0 +1,5 @@
+2024.01.09 23:20:24 INFO  Started: Metals version 1.2.0 in folders 'C:\Users\Fishy\OneDrive\Desktop\proj' for client Visual Studio Code 1.85.1.
+2024.01.09 23:20:26 WARN  Build server is not auto-connectable.
+2024.01.09 23:20:26 WARN  no build tool detected in workspace 'C:\Users\Fishy\OneDrive\Desktop\proj'. The most common cause for this problem is that the editor was opened in the wrong working directory, for example if you use sbt then the workspace directory should contain build.sbt. 
+Jan 10, 2024 1:45:04 AM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFO: Unsupported notification method: $/setTrace
