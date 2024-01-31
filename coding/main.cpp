@@ -4009,22 +4009,22 @@ public:
     }
     void createSpriteMap() 
 		{
-		// Map for the board background
-		spriteMap[0] = sf::Sprite(textures[0]);
+			// Map for the board background
+			spriteMap[0] = sf::Sprite(textures[0]);
 
-		//Map for pieces
-        spriteMap[1] = sf::Sprite(textures[1]);   // PawnBlack
-        spriteMap[-1] = sf::Sprite(textures[2]);  // PawnWhite
-        spriteMap[2] = sf::Sprite(textures[3]);   // RookBlack
-        spriteMap[-2] = sf::Sprite(textures[4]);  // RookWhite
-        spriteMap[3] = sf::Sprite(textures[5]);   // KnightBlack
-        spriteMap[-3] = sf::Sprite(textures[6]);  // KnightWhite
-        spriteMap[4] = sf::Sprite(textures[7]);   // BishopBlack
-		spriteMap[-4] = sf::Sprite(textures[8]);  // BishopWhite
-		spriteMap[5] = sf::Sprite(textures[9]);   // QueenBlack
-		spriteMap[-5] = sf::Sprite(textures[10]); // QueenWhite
-		spriteMap[6] = sf::Sprite(textures[11]);  // KingBlack
-		spriteMap[-6] = sf::Sprite(textures[12]); // KingWhite
+			//Map for pieces
+			spriteMap[1] = sf::Sprite(textures[1]);   // PawnBlack
+			spriteMap[-1] = sf::Sprite(textures[2]);  // PawnWhite
+			spriteMap[2] = sf::Sprite(textures[3]);   // RookBlack
+			spriteMap[-2] = sf::Sprite(textures[4]);  // RookWhite
+			spriteMap[3] = sf::Sprite(textures[5]);   // KnightBlack
+			spriteMap[-3] = sf::Sprite(textures[6]);  // KnightWhite
+			spriteMap[4] = sf::Sprite(textures[7]);   // BishopBlack
+			spriteMap[-4] = sf::Sprite(textures[8]);  // BishopWhite
+			spriteMap[5] = sf::Sprite(textures[9]);   // QueenBlack
+			spriteMap[-5] = sf::Sprite(textures[10]); // QueenWhite
+			spriteMap[6] = sf::Sprite(textures[11]);  // KingBlack
+			spriteMap[-6] = sf::Sprite(textures[12]); // KingWhite
     }
     void selectPiece(int x, int y, int board[12][12]) 
 	{
