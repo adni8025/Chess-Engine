@@ -3970,7 +3970,9 @@ string PlayGame(int numMoves, string FEN)
 class Display 
 {
 private:
-    sf::RenderWindow& window;
+	const string IMAGE_PATH = "imgs/";
+    
+	sf::RenderWindow& window;
     vector<sf::Texture> textures;
 	std::unordered_map<int, sf::Sprite> spriteMap; // Mapping piece type to sprite
     int size;
@@ -3979,9 +3981,6 @@ private:
 	chess chessgame;
 	bool isPieceSelected = false;
 	sf::Vector2f mousePosition;
-
-	const string IMAGE_PATH = "imgs/";
-
 public:
     Display(sf::RenderWindow& win, int tileSize) : window(win), size(tileSize) 
 	{
@@ -4000,31 +3999,32 @@ public:
         };
 
         textures.resize(textureFiles.size());
-        for (size_t i = 0; i < textureFiles.size(); ++i) {
+        for (size_t i = 0; i < textureFiles.size(); i++) 
+		{
             if (!textures[i].loadFromFile(IMAGE_PATH + textureFiles[i])) //Adding to textures here
-						{
+			{
                 cout<<"File "<<textureFiles[i]<<" not found."<<endl; 
             }
         }
     }
     void createSpriteMap() 
-		{
-			// Map for the board background
-			spriteMap[0] = sf::Sprite(textures[0]);
+	{
+		// Map for the board background
+		spriteMap[0] = sf::Sprite(textures[0]);
 
-			//Map for pieces
-			spriteMap[1] = sf::Sprite(textures[1]);   // PawnBlack
-			spriteMap[-1] = sf::Sprite(textures[2]);  // PawnWhite
-			spriteMap[2] = sf::Sprite(textures[3]);   // RookBlack
-			spriteMap[-2] = sf::Sprite(textures[4]);  // RookWhite
-			spriteMap[3] = sf::Sprite(textures[5]);   // KnightBlack
-			spriteMap[-3] = sf::Sprite(textures[6]);  // KnightWhite
-			spriteMap[4] = sf::Sprite(textures[7]);   // BishopBlack
-			spriteMap[-4] = sf::Sprite(textures[8]);  // BishopWhite
-			spriteMap[5] = sf::Sprite(textures[9]);   // QueenBlack
-			spriteMap[-5] = sf::Sprite(textures[10]); // QueenWhite
-			spriteMap[6] = sf::Sprite(textures[11]);  // KingBlack
-			spriteMap[-6] = sf::Sprite(textures[12]); // KingWhite
+		//Map for pieces
+		spriteMap[1] = sf::Sprite(textures[1]);   // PawnBlack
+		spriteMap[-1] = sf::Sprite(textures[2]);  // PawnWhite
+		spriteMap[2] = sf::Sprite(textures[3]);   // RookBlack
+		spriteMap[-2] = sf::Sprite(textures[4]);  // RookWhite
+		spriteMap[3] = sf::Sprite(textures[5]);   // KnightBlack
+		spriteMap[-3] = sf::Sprite(textures[6]);  // KnightWhite
+		spriteMap[4] = sf::Sprite(textures[7]);   // BishopBlack
+		spriteMap[-4] = sf::Sprite(textures[8]);  // BishopWhite
+		spriteMap[5] = sf::Sprite(textures[9]);   // QueenBlack
+		spriteMap[-5] = sf::Sprite(textures[10]); // QueenWhite
+		spriteMap[6] = sf::Sprite(textures[11]);  // KingBlack
+		spriteMap[-6] = sf::Sprite(textures[12]); // KingWhite
     }
     void selectPiece(int x, int y, int board[12][12]) 
 	{
@@ -4079,29 +4079,29 @@ public:
 	}
 	void drawBoard(const int board[12][12]) 
 	{
-			sf::Vector2i pos = sf::Mouse::getPosition(window);
-	int x = 2+(pos.x / 100);
-	int y = 2+(pos.y / 100);
-	window.draw(spriteMap[0]); // Draw the board background
+		sf::Vector2i pos = sf::Mouse::getPosition(window);
+		int x = 2+(pos.x / 100);
+		int y = 2+(pos.y / 100);
+		window.draw(spriteMap[0]); // Draw the board background
 
-	for (int i = 2; i < 10; i++) 
+		for (int i = 2; i < 10; i++) 
+		{
+			for (int j = 2; j < 10; j++) 
 			{
-		for (int j = 2; j < 10; j++) 
-					{
-						if(moveSel == 1)
-							{
-								selectedSprite.setPosition(pos.x-dx, pos.y-dy);
-								window.draw(selectedSprite);
-							}
-			int piece = board[i][j];
-			if (piece != 0 && spriteMap.find(piece) != spriteMap.end()) 
-							{
-				spriteMap[piece].setPosition((j - 2) * size, (i - 2) * size);
-				window.draw(spriteMap[piece]);
+				if(moveSel == 1)
+				{
+					selectedSprite.setPosition(pos.x-dx, pos.y-dy);
+					window.draw(selectedSprite);
+				}
+				int piece = board[i][j];
+				if (piece != 0 && spriteMap.find(piece) != spriteMap.end()) 
+				{
+					spriteMap[piece].setPosition( (j-2)*size , (i-2)*size );
+					window.draw(spriteMap[piece]);
+				}
 			}
 		}
 	}
-}
 
 };
 
@@ -4136,7 +4136,7 @@ int main()
         int y = 2+(pos.y / 100);
         while (window.pollEvent(e)) 
 		{
-			if(turn == 1)
+			if(turn == 1) //Better way to do this?
 			{
 				chessgame.makeMove(chessgame.ChooseRandomMove(chessgame.AllMovesB(chessgame.BoardtoFEN())));
 			}
@@ -4150,6 +4150,7 @@ int main()
 				{
                     display.selectPiece(x, y, board);
                 }
+				//Add right click option or integrate mousebutton left into first if statement
             }
             if (e.type == sf::Event::MouseButtonReleased) 
 			{
@@ -4157,6 +4158,7 @@ int main()
 				{
                     display.movePiece(x, y, board);
                 }
+				//Add right click option or integrate mousebutton left into first if statement
             }
         }
         window.clear();
