@@ -3972,31 +3972,31 @@ class Display
 private:
     sf::RenderWindow& window;
     vector<sf::Texture> textures;
-		std::unordered_map<int, sf::Sprite> spriteMap; // Mapping piece type to sprite
+	std::unordered_map<int, sf::Sprite> spriteMap; // Mapping piece type to sprite
     int size;
-		sf::Vector2i selectedPos;
+	sf::Vector2i selectedPos;
     int selectedPiece = 0;
-		chess chessgame;
-		bool isPieceSelected = false;
-		sf::Vector2f mousePosition;
+	chess chessgame;
+	bool isPieceSelected = false;
+	sf::Vector2f mousePosition;
 
-		const string IMAGE_PATH = "imgs/";
+	const string IMAGE_PATH = "imgs/";
 
 public:
     Display(sf::RenderWindow& win, int tileSize) : window(win), size(tileSize) 
-		{
+	{
         loadTextures();
         createSpriteMap();
     }
 
     void loadTextures() 
-		{
+	{
         vector<string> textureFiles = 
-				{
+		{
             "board.png", "PawnB.png", "PawnW.png", "RookB.png",
-						"RookW.png", "KnightB.png", "KnightW.png", 
-						"BishopB.png", "BishopW.png", "QueenB.png", "QueenW.png", "KingB.png",
-						"KingW.png", "PromoteW.png", "PromoteB.png",
+			"RookW.png", "KnightB.png", "KnightW.png", 
+			"BishopB.png", "BishopW.png", "QueenB.png", "QueenW.png", "KingB.png",
+			"KingW.png", "PromoteW.png", "PromoteB.png",
         };
 
         textures.resize(textureFiles.size());
@@ -4009,10 +4009,10 @@ public:
     }
     void createSpriteMap() 
 		{
-			  // Map for the board background
-    		spriteMap[0] = sf::Sprite(textures[0]);
+		// Map for the board background
+		spriteMap[0] = sf::Sprite(textures[0]);
 
-				//Map for pieces
+		//Map for pieces
         spriteMap[1] = sf::Sprite(textures[1]);   // PawnBlack
         spriteMap[-1] = sf::Sprite(textures[2]);  // PawnWhite
         spriteMap[2] = sf::Sprite(textures[3]);   // RookBlack
@@ -4020,88 +4020,88 @@ public:
         spriteMap[3] = sf::Sprite(textures[5]);   // KnightBlack
         spriteMap[-3] = sf::Sprite(textures[6]);  // KnightWhite
         spriteMap[4] = sf::Sprite(textures[7]);   // BishopBlack
-				spriteMap[-4] = sf::Sprite(textures[8]);  // BishopWhite
-				spriteMap[5] = sf::Sprite(textures[9]);   // QueenBlack
-				spriteMap[-5] = sf::Sprite(textures[10]); // QueenWhite
-				spriteMap[6] = sf::Sprite(textures[11]);  // KingBlack
-				spriteMap[-6] = sf::Sprite(textures[12]); // KingWhite
+		spriteMap[-4] = sf::Sprite(textures[8]);  // BishopWhite
+		spriteMap[5] = sf::Sprite(textures[9]);   // QueenBlack
+		spriteMap[-5] = sf::Sprite(textures[10]); // QueenWhite
+		spriteMap[6] = sf::Sprite(textures[11]);  // KingBlack
+		spriteMap[-6] = sf::Sprite(textures[12]); // KingWhite
     }
     void selectPiece(int x, int y, int board[12][12]) 
+	{
+		oX = x;
+		oY = y;
+		sf::Vector2i mouse = sf::Mouse::getPosition(window);
+		dx = mouse.x - (x-2)*size;
+		dy = mouse.y - (y-2)*size;
+		if (board[y][x] != 0 && spriteMap.find(board[y][x]) != spriteMap.end()) 
 		{
-			oX = x;
-			oY = y;
-			sf::Vector2i mouse = sf::Mouse::getPosition(window);
-			dx = mouse.x - (x-2)*size;
-			dy = mouse.y - (y-2)*size;
-			if (board[y][x] != 0 && spriteMap.find(board[y][x]) != spriteMap.end()) 
-			{
-				chessgame.CopyingToTempBoard();
-				selectedPiece = board[y][x];
-				selectedSprite = spriteMap[board[y][x]];
-				board[y][x] = 0;
-				moveSel = 1;
-			}
+			chessgame.CopyingToTempBoard();
+			selectedPiece = board[y][x];
+			selectedSprite = spriteMap[board[y][x]];
+			board[y][x] = 0;
+			moveSel = 1;
 		}
-		void movePiece(int x, int y, int board[12][12]) 
-		{
-			string allIndexMoves;
-			string move = to_string(oX)+to_string(oY)+to_string(x)+to_string(y);
-			int allow = 0;
-			if(allIndexMoves == " ")
-			{cout<<"Checkmate"<<endl;}
-			if(turn == 0)
-				{allIndexMoves = chessgame.convertToIndexString(chessgame.AllMovesW(chessgame.tempBoardtoFEN()));}
-			else
-				{allIndexMoves = chessgame.convertToIndexString(chessgame.AllMovesB(chessgame.tempBoardtoFEN()));}
-	
-			for(int i = 0; i<allIndexMoves.size(); i+=5)
-			{
-				if(allIndexMoves[i] == move[0] && allIndexMoves[i+1] == move[1] && allIndexMoves[i+2] == move[2] && allIndexMoves[i+3] == move[3])
-				{
-					allow = 1;
-				}
-			}
-			if (selectedPiece && allow == 1) 
-			{
-				board[oY][oX] = 0;
-				board[y][x] = selectedPiece;
-				selectedPiece = 0;
-				moveSel = 0;
-				allow = 0;
-				turn = 1 - turn;
-			}
-			else if(selectedPiece && allow == 0)
-			{
-				board[oY][oX] = selectedPiece;
-				selectedPiece = 0;
-				moveSel = 0;
-			}
-		}
-		void drawBoard(const int board[12][12]) 
-		{
-				sf::Vector2i pos = sf::Mouse::getPosition(window);
-        int x = 2+(pos.x / 100);
-        int y = 2+(pos.y / 100);
-        window.draw(spriteMap[0]); // Draw the board background
+	}
+	void movePiece(int x, int y, int board[12][12]) 
+	{
+		string allIndexMoves;
+		string move = to_string(oX)+to_string(oY)+to_string(x)+to_string(y);
+		int allow = 0;
+		if(allIndexMoves == "")
+		{cout<<"Checkmate"<<endl;}
+		if(turn == 0)
+			{allIndexMoves = chessgame.convertToIndexString(chessgame.AllMovesW(chessgame.tempBoardtoFEN()));}
+		else
+			{allIndexMoves = chessgame.convertToIndexString(chessgame.AllMovesB(chessgame.tempBoardtoFEN()));}
 
-        for (int i = 2; i < 10; i++) 
-				{
-            for (int j = 2; j < 10; j++) 
-						{
-							if(moveSel == 1)
-								{
-									selectedSprite.setPosition(pos.x-dx, pos.y-dy);
-									window.draw(selectedSprite);
-								}
-                int piece = board[i][j];
-                if (piece != 0 && spriteMap.find(piece) != spriteMap.end()) 
-								{
-                    spriteMap[piece].setPosition((j - 2) * size, (i - 2) * size);
-                    window.draw(spriteMap[piece]);
-                }
-            }
-        }
-    }
+		for(int i = 0; i<allIndexMoves.size(); i+=5)
+		{
+			if(allIndexMoves[i] == move[0] && allIndexMoves[i+1] == move[1] && allIndexMoves[i+2] == move[2] && allIndexMoves[i+3] == move[3])
+			{
+				allow = 1;
+			}
+		}
+		if (selectedPiece && allow == 1) 
+		{
+			board[oY][oX] = 0;
+			board[y][x] = selectedPiece;
+			selectedPiece = 0;
+			moveSel = 0;
+			allow = 0;
+			turn = 1 - turn;
+		}
+		else if(selectedPiece && allow == 0)
+		{
+			board[oY][oX] = selectedPiece;
+			selectedPiece = 0;
+			moveSel = 0;
+		}
+	}
+	void drawBoard(const int board[12][12]) 
+	{
+			sf::Vector2i pos = sf::Mouse::getPosition(window);
+	int x = 2+(pos.x / 100);
+	int y = 2+(pos.y / 100);
+	window.draw(spriteMap[0]); // Draw the board background
+
+	for (int i = 2; i < 10; i++) 
+			{
+		for (int j = 2; j < 10; j++) 
+					{
+						if(moveSel == 1)
+							{
+								selectedSprite.setPosition(pos.x-dx, pos.y-dy);
+								window.draw(selectedSprite);
+							}
+			int piece = board[i][j];
+			if (piece != 0 && spriteMap.find(piece) != spriteMap.end()) 
+							{
+				spriteMap[piece].setPosition((j - 2) * size, (i - 2) * size);
+				window.draw(spriteMap[piece]);
+			}
+		}
+	}
+}
 
 };
 
@@ -4109,7 +4109,7 @@ int main()
 {
 	chess chessgame;
 	sf::RenderWindow window(sf::VideoMode(WINDOW_SIZE, WINDOW_SIZE), "");
-  Display display(window, TILE_SIZE);
+  	Display display(window, TILE_SIZE);
 
 	string FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 	int count = 0;
@@ -4131,32 +4131,30 @@ int main()
 
     while (window.isOpen()) {
         sf::Event e;
-				sf::Vector2i pos = sf::Mouse::getPosition(window);
+		sf::Vector2i pos = sf::Mouse::getPosition(window);
         int x = 2+(pos.x / 100);
         int y = 2+(pos.y / 100);
         while (window.pollEvent(e)) 
-				{
-						if(turn == 1)
-						{
-							chessgame.makeMove(chessgame.ChooseRandomMove(chessgame.AllMovesB(chessgame.BoardtoFEN())));
-						}
+		{
+			if(turn == 1)
+			{
+				chessgame.makeMove(chessgame.ChooseRandomMove(chessgame.AllMovesB(chessgame.BoardtoFEN())));
+			}
             if (e.type == sf::Event::Closed) 
-						{
+			{
                 window.close();
             }
-
             if (e.type == sf::Event::MouseButtonPressed) 
-						{
+			{
                 if (e.mouseButton.button == sf::Mouse::Left) 
-								{
+				{
                     display.selectPiece(x, y, board);
                 }
             }
-
             if (e.type == sf::Event::MouseButtonReleased) 
-						{
+			{
                 if (e.mouseButton.button == sf::Mouse::Left) 
-								{
+				{
                     display.movePiece(x, y, board);
                 }
             }
