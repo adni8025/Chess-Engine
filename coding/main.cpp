@@ -3648,9 +3648,27 @@ int IsMatingMaterial(string FEN)
 }
 void makeMove(string move)
 {
-		CopyingToTempBoard();
-		CopyingToMainBoard();
-		UpdateCastleRights();
+	CopyingToTempBoard();
+	CopyingToMainBoard();
+	kingPosW(); 
+	kingPosB();
+	UpdateCastleRights();
+	resetFiftyMoveRule = 0;
+	validSquare = 0;
+	totalMovesplayed++;
+
+	if(IsMatingMaterial(BoardtoFEN()) == 0)
+	{
+		resetAllValuesAfterGameEnd();
+		draw++;
+		cout<<"Draw";
+	}
+	if(countFiftyMoveRule == 50)
+	{
+		draw++;
+		resetAllValuesAfterGameEnd();
+		cout<<"Draw";
+	}
 		char first = move[0] - 47;
 		char second = move[1];
 		char third = move[2] - 47;
@@ -3872,6 +3890,7 @@ void makeMove(string move)
 		{
 			turn = 0;
 		}
+	UpdateCastleRights();
 }
 vector<string> parseMoves(const string& movesString) {
     vector<string> moves;
@@ -4067,7 +4086,7 @@ public:
 		if (selectedPiece && allow == 1) 
 		{
 			chessgame.makeMove(chessgame.convertIndexToSqr(oX,oY)+chessgame.convertIndexToSqr(x,y));
-
+			cout<<chessgame.BoardtoFEN()<<endl;
 			selectedPiece = 0;
 			moveSel = 0;
 			allow = 0;
