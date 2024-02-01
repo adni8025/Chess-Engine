@@ -3650,6 +3650,7 @@ void makeMove(string move)
 {
 		CopyingToTempBoard();
 		CopyingToMainBoard();
+		UpdateCastleRights();
 		char first = move[0] - 47;
 		char second = move[1];
 		char third = move[2] - 47;
@@ -4066,6 +4067,7 @@ public:
 		if (selectedPiece && allow == 1) 
 		{
 			chessgame.makeMove(chessgame.convertIndexToSqr(oX,oY)+chessgame.convertIndexToSqr(x,y));
+
 			selectedPiece = 0;
 			moveSel = 0;
 			allow = 0;
