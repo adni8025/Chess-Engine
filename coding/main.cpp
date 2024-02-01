@@ -98,8 +98,8 @@ private:
 	
 	int castleRights[Color][CastleSide] = //Index Color 0 = white -- Index Color 1 = black -- Index CastleSide 0 = Queen Side -- Index CastleSide 1 = King side
 	{
-		0, 0, //1 = allowed to castle, 0= not allowed to castle 
-		0, 0,
+		1, 1, //1 = allowed to castle, 0= not allowed to castle 
+		1, 1,
 	};
 	int hasBlackKingMoved = 0, hasWhiteKingMoved = 0, hasLeftBlackRookMoved = 0, 
 	hasRightBlackRookMoved = 0, hasLeftWhiteRookMoved = 0, hasRightWhiteRookMoved = 0, 
@@ -4047,13 +4047,15 @@ public:
 		string allIndexMoves;
 		string move = to_string(oX)+to_string(oY)+to_string(x)+to_string(y);
 		int allow = 0;
-		if(allIndexMoves == "")
-		{cout<<"Checkmate"<<endl;}
-		if(turn == 0)
-			{allIndexMoves = chessgame.convertToIndexString(chessgame.AllMovesW(chessgame.tempBoardtoFEN()));}
-		else
-			{allIndexMoves = chessgame.convertToIndexString(chessgame.AllMovesB(chessgame.tempBoardtoFEN()));}
-
+		if(moveSel == 1)
+		{
+			chessgame.CopyingToMainBoard();
+			if(turn == 0)
+				{allIndexMoves = chessgame.convertToIndexString(chessgame.AllMovesW(chessgame.BoardtoFEN()));}
+			else
+				{allIndexMoves = chessgame.convertToIndexString(chessgame.AllMovesB(chessgame.BoardtoFEN()));}
+		}
+		
 		for(int i = 0; i<allIndexMoves.size(); i+=5)
 		{
 			if(allIndexMoves[i] == move[0] && allIndexMoves[i+1] == move[1] && allIndexMoves[i+2] == move[2] && allIndexMoves[i+3] == move[3])
@@ -4063,12 +4065,10 @@ public:
 		}
 		if (selectedPiece && allow == 1) 
 		{
-			board[oY][oX] = 0;
-			board[y][x] = selectedPiece;
+			chessgame.makeMove(chessgame.convertIndexToSqr(oX,oY)+chessgame.convertIndexToSqr(x,y));
 			selectedPiece = 0;
 			moveSel = 0;
 			allow = 0;
-			turn = 1 - turn;
 		}
 		else if(selectedPiece && allow == 0)
 		{
@@ -4136,10 +4136,10 @@ int main()
         int y = 2+(pos.y / 100);
         while (window.pollEvent(e)) 
 		{
-			if(turn == 1) //Better way to do this?
-			{
-				chessgame.makeMove(chessgame.ChooseRandomMove(chessgame.AllMovesB(chessgame.BoardtoFEN())));
-			}
+			// if(turn == 1) //Better way to do this?
+			// {
+			// 	chessgame.makeMove(chessgame.ChooseRandomMove(chessgame.AllMovesB(chessgame.BoardtoFEN())));
+			// }
             if (e.type == sf::Event::Closed) 
 			{
                 window.close();
