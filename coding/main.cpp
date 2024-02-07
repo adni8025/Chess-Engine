@@ -3134,15 +3134,24 @@ string convertToIndexString(const string& movesStr)
 				int endIndexY = 2+'8' - endRow;
 
 				// Append converted indexes to the string
-				indexMoves += to_string(startIndexX) + to_string(startIndexY) + to_string(endIndexX) + to_string(endIndexY) + " ";
+				indexMoves += to_string(startIndexX) + to_string(startIndexY) + to_string(endIndexX) + to_string(endIndexY);
 				if((movesStr[i+4]) == ' ') //Normal moves
 				{
 					//Nothing
 				}
 				else if((movesStr[i+4]) != ' ') //For promotions
 				{
+					if(movesStr[i+5] == 'N')
+					{indexMoves += 'N';}
+					else if(movesStr[i+5] == 'B')
+					{indexMoves += 'B';}
+					else if(movesStr[i+5] == 'R')
+					{indexMoves += 'R';}
+					else if(movesStr[i+5] == 'Q')
+					{indexMoves += 'Q';}
 					i+=2;
 				}
+				indexMoves+=" ";
     }
 
     return indexMoves;
@@ -3980,6 +3989,9 @@ private:
     int selectedPiece = 0;
 	chess chessgame;
 	bool isPieceSelected = false;
+	bool isPromotionMove = false;
+	int xx = 0;
+	int yy = 0;
 	sf::Vector2f mousePosition;
 public:
     Display(sf::RenderWindow& win, int tileSize) : window(win), size(tileSize) 
@@ -3995,7 +4007,7 @@ public:
             "board.png", "PawnB.png", "PawnW.png", "RookB.png",
 			"RookW.png", "KnightB.png", "KnightW.png", 
 			"BishopB.png", "BishopW.png", "QueenB.png", "QueenW.png", "KingB.png",
-			"KingW.png", "PromoteW.png", "PromoteB.png",
+			"KingW.png", "PromoteB.png", "PromoteW.png",
         };
 
         textures.resize(textureFiles.size());
@@ -4025,6 +4037,10 @@ public:
 		spriteMap[-5] = sf::Sprite(textures[10]); // QueenWhite
 		spriteMap[6] = sf::Sprite(textures[11]);  // KingBlack
 		spriteMap[-6] = sf::Sprite(textures[12]); // KingWhite
+		
+		spriteMap[7] = sf::Sprite(textures[13]); //Promotions White
+		spriteMap[8] = sf::Sprite(textures[14]); //Promotions Black
+
     }
     void selectPiece(int x, int y, int board[12][12]) 
 	{
@@ -4051,21 +4067,37 @@ public:
 		{
 			chessgame.CopyingToMainBoard();
 			if(turn == 0)
-				{allIndexMoves = chessgame.convertToIndexString(chessgame.AllMovesW(chessgame.BoardtoFEN()));}
+				{allIndexMoves = chessgame.convertToIndexString(chessgame.AllMovesW(chessgame.BoardtoFEN()));
+					cout<<chessgame.AllMovesW(chessgame.BoardtoFEN())<<endl;
+				}
 			else
-				{allIndexMoves = chessgame.convertToIndexString(chessgame.AllMovesB(chessgame.BoardtoFEN()));}
+				{allIndexMoves = chessgame.convertToIndexString(chessgame.AllMovesB(chessgame.BoardtoFEN()));
+					cout<<chessgame.AllMovesB(chessgame.BoardtoFEN())<<endl;
+					}
 		}
+		cout<<allIndexMoves<<endl;
 		
 		for(int i = 0; i<allIndexMoves.size(); i+=5)
 		{
+			
 			if(allIndexMoves[i] == move[0] && allIndexMoves[i+1] == move[1] && allIndexMoves[i+2] == move[2] && allIndexMoves[i+3] == move[3])
 			{
 				allow = 1;
+				if(allIndexMoves[i+4] != ' ')
+				{
+					xx = x;
+					yy = y;
+					isPromotionMove = true;
+				}
+				break;
 			}
 		}
 		if (selectedPiece && allow == 1) 
 		{
-			chessgame.makeMove(chessgame.convertIndexToSqr(oX,oY)+chessgame.convertIndexToSqr(x,y));
+			string moveToMake = chessgame.convertIndexToSqr(oX,oY)+chessgame.convertIndexToSqr(x,y);
+			if(isPromotionMove) 
+			{}
+			chessgame.makeMove(moveToMake);
 			selectedPiece = 0;
 			moveSel = 0;
 			allow = 0;
@@ -4098,6 +4130,11 @@ public:
 				{
 					spriteMap[piece].setPosition( (j-2)*size , (i-2)*size );
 					window.draw(spriteMap[piece]);
+					if(isPromotionMove)
+					{
+						spriteMap[7+turn].setPosition( (xx-2)*size , (yy-2)*size );
+						window.draw(spriteMap[7+turn]);
+					}
 				}
 			}
 		}
