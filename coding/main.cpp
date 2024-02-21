@@ -4010,6 +4010,7 @@ private:
 	chess chessgame;
 	bool isPieceSelected = false;
 	bool isPromotionMove = false;
+	uint8_t pieceToPromote = 0; //1=Queen 2=Rook 3=Bishop 4=Knight
 	int xx = 0;
 	int yy = 0;
 	sf::Vector2f mousePosition;
@@ -4064,11 +4065,37 @@ public:
     }
     void selectPiece(int x, int y, int board[12][12]) 
 	{
-		oX = x;
-		oY = y;
 		sf::Vector2i mouse = sf::Mouse::getPosition(window);
 		dx = mouse.x - (x-2)*size;
 		dy = mouse.y - (y-2)*size;
+
+		if(isPromotionMove)
+		{
+			if( (mouse.x/TILE_SIZE)==(xx - 2) && (mouse.y/TILE_SIZE)==(yy - 2) )
+			{
+				if(dx <= 50 && dy <= 50)
+				{
+					pieceToPromote = 1;
+				}
+				else if(dx <= 50 && dy >= 50)
+				{
+					pieceToPromote = 2;
+				}
+				else if(dx >= 50 && dy <= 50)
+				{
+					pieceToPromote = 3;
+				}
+				else if(dx >= 50 && dy >= 50)
+				{
+					pieceToPromote = 4;
+				}
+			}
+			else{pieceToPromote = -1;}
+			return;
+		}
+
+		oX = x;
+		oY = y;
 		if (board[y][x] != 0 && spriteMap.find(board[y][x]) != spriteMap.end()) 
 		{
 			chessgame.CopyingToTempBoard();
@@ -4083,6 +4110,37 @@ public:
 		string allIndexMoves;
 		string move = to_string(oX)+to_string(oY)+to_string(x)+to_string(y);
 		int allow = 0;
+		string moveToMake = chessgame.convertIndexToSqr(oX,oY)+chessgame.convertIndexToSqr(x,y);
+
+		if (isPromotionMove) 
+		{
+			char promotionChar = 'Q'; // Default to Queen
+			switch (pieceToPromote) 
+			{
+				case 1: promotionChar = 'Q'; break; // Queen
+				case 2: promotionChar = 'R'; break; // Rook
+				case 3: promotionChar = 'B'; break; // Bishop
+				case 4: promotionChar = 'N'; break; // Knight
+				default: 
+                	break;
+			}
+			if (pieceToPromote != -1) 
+			{
+				moveToMake += "=";
+				moveToMake += promotionChar;
+				chessgame.makeMove(moveToMake); // Apply the promotion move
+			}
+
+			// Resetting state after promotion
+			pieceToPromote = 0;
+			isPromotionMove = false;
+			chessgame.CopyingToMainBoard();
+			turn = 1 - turn;
+			return;
+    	}
+
+
+
 		if(moveSel == 1)
 		{
 			chessgame.CopyingToMainBoard();
@@ -4093,30 +4151,32 @@ public:
 			else
 				{allIndexMoves = chessgame.convertToIndexString(chessgame.AllMovesB(chessgame.BoardtoFEN()));
 					cout<<chessgame.AllMovesB(chessgame.BoardtoFEN())<<endl;
-					}
+				}
 		}
 		cout<<allIndexMoves<<endl;
 		
 		for(int i = 0; i<allIndexMoves.size(); i+=5)
 		{
-			
 			if(allIndexMoves[i] == move[0] && allIndexMoves[i+1] == move[1] && allIndexMoves[i+2] == move[2] && allIndexMoves[i+3] == move[3])
 			{
-				allow = 1;
 				if(allIndexMoves[i+4] != ' ')
 				{
+					chessgame.CopyingToTempBoard();
+					isPromotionMove = true;
 					xx = x;
 					yy = y;
-					isPromotionMove = true;
+					selectedPiece = 0;
+					moveSel = 0;
+					board[oX][oY] = 0;
+					turn = 1-turn;
+					return;
 				}
+				allow = 1;
 				break;
 			}
 		}
 		if (selectedPiece && allow == 1) 
 		{
-			string moveToMake = chessgame.convertIndexToSqr(oX,oY)+chessgame.convertIndexToSqr(x,y);
-			if(isPromotionMove) 
-			{}
 			chessgame.makeMove(moveToMake);
 			selectedPiece = 0;
 			moveSel = 0;
@@ -4136,13 +4196,19 @@ public:
 		int y = 2+(pos.y / 100);
 		window.draw(spriteMap[0]); // Draw the board background
 
+		if(isPromotionMove)
+		{
+			spriteMap[7+turn].setPosition( (xx-2)*size , (yy-2)*size );
+			window.draw(spriteMap[7+turn]);
+		}
+
 		for (int i = 2; i < 10; i++) 
 		{
 			for (int j = 2; j < 10; j++) 
 			{
 				if(moveSel == 1)
 				{
-					selectedSprite.setPosition(pos.x-dx, pos.y-dy);
+					selectedSprite.setPosition( pos.x-dx , pos.y-dy );
 					window.draw(selectedSprite);
 				}
 				int piece = board[i][j];
@@ -4150,16 +4216,10 @@ public:
 				{
 					spriteMap[piece].setPosition( (j-2)*size , (i-2)*size );
 					window.draw(spriteMap[piece]);
-					if(isPromotionMove)
-					{
-						spriteMap[7+turn].setPosition( (xx-2)*size , (yy-2)*size );
-						window.draw(spriteMap[7+turn]);
-					}
 				}
 			}
 		}
 	}
-
 };
 
 int main()
